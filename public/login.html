@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Conference Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+<style>
+  body{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:16px; }
+  .card{
+    width:100%; max-width:380px; background:var(--paper-raised); border:1px solid var(--line);
+    border-radius:14px; box-shadow:var(--shadow); padding:32px 30px;
+  }
+  .logo-slot{
+    width:100%; height:56px; display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .logo-slot img{ max-height:56px; max-width:100%; }
+  .logo-placeholder{
+    width:44px; height:44px; border-radius:10px; background:var(--gold);
+    display:flex; align-items:center; justify-content:center; color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px;
+  }
+  h1{ font-family:'Space Grotesk',sans-serif; font-size:20px; text-align:center; margin:0 0 4px 0; }
+  .sub{ text-align:center; color:var(--ink-soft); font-size:13px; margin-bottom:24px; }
+  .field{ margin-bottom:14px; }
+  label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:5px; }
+  input{ width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; }
+  input:focus{ outline:2px solid var(--teal); outline-offset:1px; border-color:var(--teal); }
+  .btn{
+    width:100%; padding:11px; border-radius:8px; border:none; background:var(--ink); color:#fff;
+    font-weight:600; font-size:14px; cursor:pointer; margin-top:6px;
+  }
+  .btn:hover{ opacity:0.92; }
+  .error{
+    background:var(--brick-dim); color:var(--brick); font-size:13px; padding:9px 12px;
+    border-radius:7px; margin-bottom:14px; display:none;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-slot" id="logo-slot"><div class="logo-placeholder">C</div></div>
+    <h1 id="company-name">Conference Ops</h1>
+    <div class="sub">Sign in to your team's tracker</div>
+    <div class="error" id="error"></div>
+    <form id="login-form">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+  </div>
+
+<script>
+  fetch('/api/settings').then(r=>r.ok?r.json():null).then(s=>{
+    if(!s) return;
+    if(s.companyName) document.getElementById('company-name').textContent = s.companyName;
+    if(s.logoPath){
+      document.getElementById('logo-slot').innerHTML = `<img src="${s.logoPath}" alt="${s.companyName||'Logo'}">`;
+    }
+  }).catch(()=>{});
+
+  document.getElementById('login-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const errorEl = document.getElementById('error');
+    errorEl.style.display = 'none';
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    try{
+      const res = await fetch('/api/auth/login', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if(!res.ok){ errorEl.textContent = data.error || 'Sign in failed'; errorEl.style.display='block'; return; }
+      window.location.href = '/app.html';
+    }catch(err){
+      errorEl.textContent = 'Could not reach the server — try again.';
+      errorEl.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

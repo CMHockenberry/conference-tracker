@@ -1,0 +1,23 @@
+:root{
+  --ink:#161F2B;
+  --ink-soft:#4A5568;
+  --paper:#F1F0EA;
+  --paper-raised:#FFFFFF;
+  --line:#DAD5C7;
+  --teal:#1F6F5C;
+  --teal-dim:#E4EEEA;
+  --gold:#D9A441;
+  --gold-dim:#FBF1DC;
+  --brick:#B5473A;
+  --brick-dim:#F7E7E3;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(22,31,43,0.06), 0 4px 14px rgba(22,31,43,0.05);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
